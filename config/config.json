@@ -1,0 +1,20 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/spfx-build/config.2.0.schema.json",
+  "version": "2.0",
+  "bundles": {
+    "sp-fx-page-properties-web-part": {
+      "components": [
+        {
+          "entrypoint": "./lib/webparts/spFxPageProperties/SpFxPagePropertiesWebPart.js",
+          "manifest": "./src/webparts/spFxPageProperties/SpFxPagePropertiesWebPart.manifest.json"
+        }
+      ]
+    }
+  },
+  "externals": {},
+  "localizedResources": {
+    "SpFxPagePropertiesWebPartStrings": "lib/webparts/spFxPageProperties/loc/{locale}.js",
+    "PropertyControlStrings": "node_modules/@pnp/spfx-property-controls/lib/loc/{locale}.js"
+
+  }
+}

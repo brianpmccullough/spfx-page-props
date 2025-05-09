@@ -1,0 +1,18 @@
+{
+  "@microsoft/generator-sharepoint": {
+    "plusBeta": false,
+    "isCreatingSolution": true,
+    "nodeVersion": "22.15.0",
+    "sdksVersions": {},
+    "version": "1.21.0",
+    "libraryName": "spfx-page-props",
+    "libraryId": "5fb00c39-319f-4cbd-a601-1c264693277a",
+    "environment": "spo",
+    "packageManager": "npm",
+    "solutionName": "spfx-page-props",
+    "solutionShortDescription": "spfx-page-props description",
+    "skipFeatureDeployment": true,
+    "isDomainIsolated": false,
+    "componentType": "webpart"
+  }
+}
