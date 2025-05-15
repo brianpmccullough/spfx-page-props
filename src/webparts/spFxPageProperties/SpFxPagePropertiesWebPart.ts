@@ -1,11 +1,7 @@
 import * as React from 'react';
 import * as ReactDom from 'react-dom';
 import { Version } from '@microsoft/sp-core-library';
-import {
-  type IPropertyPaneConfiguration,
-  PropertyPaneTextField,
-  IPropertyPaneDropdownOption
-} from '@microsoft/sp-property-pane';
+import { type IPropertyPaneConfiguration, PropertyPaneTextField, IPropertyPaneDropdownOption } from '@microsoft/sp-property-pane';
 import { PropertyFieldMultiSelect } from '@pnp/spfx-property-controls';
 import { BaseClientSideWebPart } from '@microsoft/sp-webpart-base';
 import { IReadonlyTheme } from '@microsoft/sp-component-base';
@@ -23,25 +19,20 @@ export interface ISpFxPagePropertiesWebPartProps {
 }
 
 export default class SpFxPagePropertiesWebPart extends BaseClientSideWebPart<ISpFxPagePropertiesWebPartProps> {
-
   private _isDarkTheme: boolean = false;
   private _pagePropertiesService: IPagePropertiesService;
   private _pageProperties: Record<string, unknown> = {};
   private _listColumns: IListColumn[] = [];
 
   public render(): void {
-
-    const element: React.ReactElement<ISpFxPagePropertiesProps> = React.createElement(
-      SpFxPageProperties,
-      {
-        description: this.properties.description,
-        isDarkTheme: this._isDarkTheme,
-        hasTeamsContext: !!this.context.sdks.microsoftTeams,
-        userDisplayName: this.context.pageContext.user.displayName,
-        pageProperties: this._pageProperties,
-        selectedPageProperties: this.properties.selectedPageProperties || []
-      }
-    );
+    const element: React.ReactElement<ISpFxPagePropertiesProps> = React.createElement(SpFxPageProperties, {
+      description: this.properties.description,
+      isDarkTheme: this._isDarkTheme,
+      hasTeamsContext: !!this.context.sdks.microsoftTeams,
+      userDisplayName: this.context.pageContext.user.displayName,
+      pageProperties: this._pageProperties,
+      selectedPageProperties: this.properties.selectedPageProperties || [],
+    });
 
     ReactDom.render(element, this.domElement);
   }
@@ -58,7 +49,6 @@ export default class SpFxPagePropertiesWebPart extends BaseClientSideWebPart<ISp
       console.log('this._pageProperties');
       console.log(this._pageProperties);
       this.context.propertyPane.refresh();
-
     } catch (error) {
       console.error('Error fetching page properties:', error);
     }
@@ -72,16 +62,13 @@ export default class SpFxPagePropertiesWebPart extends BaseClientSideWebPart<ISp
     }
 
     this._isDarkTheme = !!currentTheme.isInverted;
-    const {
-      semanticColors
-    } = currentTheme;
+    const { semanticColors } = currentTheme;
 
     if (semanticColors) {
       this.domElement.style.setProperty('--bodyText', semanticColors.bodyText || null);
       this.domElement.style.setProperty('--link', semanticColors.link || null);
       this.domElement.style.setProperty('--linkHovered', semanticColors.linkHovered || null);
     }
-
   }
 
   protected onDispose(): void {
@@ -92,13 +79,10 @@ export default class SpFxPagePropertiesWebPart extends BaseClientSideWebPart<ISp
     return Version.parse('1.0');
   }
 
-
   /**
    * Called when the property pane is opened to ensure options are loaded.
    */
-  protected async onPropertyPaneConfigurationStart(): Promise<void> {
-    
-  }
+  protected async onPropertyPaneConfigurationStart(): Promise<void> {}
 
   protected onPropertyPaneFieldChanged(propertyPath: string, oldValue: any, newValue: any): void {
     if (propertyPath === 'selectedPageProperties') {
@@ -113,14 +97,14 @@ export default class SpFxPagePropertiesWebPart extends BaseClientSideWebPart<ISp
       pages: [
         {
           header: {
-            description: strings.PropertyPaneDescription
+            description: strings.PropertyPaneDescription,
           },
           groups: [
             {
               groupName: strings.BasicGroupName,
               groupFields: [
                 PropertyPaneTextField('description', {
-                  label: strings.DescriptionFieldLabel
+                  label: strings.DescriptionFieldLabel,
                 }),
                 PropertyFieldMultiSelect('selectedPageProperties', {
                   key: 'selectedPageProperties',
@@ -128,17 +112,16 @@ export default class SpFxPagePropertiesWebPart extends BaseClientSideWebPart<ISp
                   options: this._listColumns.map((column: IListColumn) => {
                     return {
                       key: column.internalName,
-                      text: column.title
+                      text: column.title,
                     } as IPropertyPaneDropdownOption;
                   }),
-                  selectedKeys: this.properties.selectedPageProperties
-                  
-                })
-              ]
-            }
-          ]
-        }
-      ]
+                  selectedKeys: this.properties.selectedPageProperties,
+                }),
+              ],
+            },
+          ],
+        },
+      ],
     };
   }
 }

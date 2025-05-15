@@ -43,20 +43,14 @@ export class PagePropertiesService implements IPagePropertiesService {
    *   const props = await pagePropertiesService.getPageProperties();
    *   console.log(props.Title);
    */
-  public async getPageProperties(
-    listColumns: IListColumn[] = []
-  ): Promise<Record<string, unknown>> {
+  public async getPageProperties(listColumns: IListColumn[] = []): Promise<Record<string, unknown>> {
     if (this._sp && this._pageId && this._listId) {
       const lookupColumnTypes = ['User', 'UserMulti', 'Lookup', 'LookupMulti'];
 
       const fieldNames = listColumns
         .map(function (column) {
           if (column.fieldType === 'User' || column.fieldType === 'UserMulti') {
-            return [
-              `${column.internalName}/Title`,
-              `${column.internalName}/Id`,
-              `${column.internalName}/UserName`,
-            ];
+            return [`${column.internalName}/Title`, `${column.internalName}/Id`, `${column.internalName}/UserName`];
           }
           return [column.internalName];
         })
@@ -105,21 +99,11 @@ export class PagePropertiesService implements IPagePropertiesService {
       const fields = await this._sp.web.lists
         .getById(this._listId)
         .contentTypes.getById(ct.Id.StringValue)
-        .fields.select(
-          'Id',
-          'Title',
-          'InternalName',
-          'TypeAsString',
-          'Hidden',
-          'Group'
-        )();
+        .fields.select('Id', 'Title', 'InternalName', 'TypeAsString', 'Hidden', 'Group')();
       for (const field of fields) {
         if (!fieldIdSet.has(field.Id)) {
           if (
-            (field.Hidden ||
-              field.Group === '_Hidden' ||
-              field.Title === 'Document Modified By' ||
-              field.Title === 'Document Created By') &&
+            (field.Hidden || field.Group === '_Hidden' || field.Title === 'Document Modified By' || field.Title === 'Document Created By') &&
             field.InternalName !== 'Description' &&
             field.InternalName !== 'Modified' &&
             field.InternalName !== 'Created' &&
