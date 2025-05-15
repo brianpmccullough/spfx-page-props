@@ -1,11 +1,11 @@
-import { SPFx, spfi, SPFI } from "@pnp/sp";
-import "@pnp/sp/webs";
-import "@pnp/sp/lists";
-import "@pnp/sp/items";
-import "@pnp/sp/content-types";
-import { IPagePropertiesService } from "./IPagePropertiesService";
-import { BaseComponentContext } from "@microsoft/sp-component-base";
-import { IListColumn } from "../models/IListSiteColumn";
+import { SPFx, spfi, SPFI } from '@pnp/sp';
+import '@pnp/sp/webs';
+import '@pnp/sp/lists';
+import '@pnp/sp/items';
+import '@pnp/sp/content-types';
+import { IPagePropertiesService } from './IPagePropertiesService';
+import { BaseComponentContext } from '@microsoft/sp-component-base';
+import { IListColumn } from '../models/IListSiteColumn';
 
 /**
  * Service to retrieve the current page's properties using @pnp/sp and SPFx context.
@@ -47,7 +47,7 @@ export class PagePropertiesService implements IPagePropertiesService {
     listColumns: IListColumn[] = []
   ): Promise<Record<string, unknown>> {
     if (this._sp && this._pageId && this._listId) {
-      const lookupColumnTypes = ["User", "UserMulti", "Lookup", "LookupMulti"];
+      const lookupColumnTypes = ['User', 'UserMulti', 'Lookup', 'LookupMulti'];
 
       const fieldNames = listColumns
         .map(function (column) {
@@ -73,11 +73,11 @@ export class PagePropertiesService implements IPagePropertiesService {
       const item = await this._sp.web.lists
         .getById(this._listId)
         .items.getById(this._pageId)
-        .select(fieldNames.join(","))
-        .expand(expandFields.join(","))();
+        .select(fieldNames.join(','))
+        .expand(expandFields.join(','))();
       return item;
     }
-    throw new Error("Service not initialized.");
+    throw new Error('Service not initialized.');
   }
 
   /**
@@ -88,13 +88,13 @@ export class PagePropertiesService implements IPagePropertiesService {
    */
   public async getListColumns(): Promise<IListColumn[]> {
     if (!this._sp || !this._listId) {
-      throw new Error("Service not initialized.");
+      throw new Error('Service not initialized.');
     }
 
     const contentTypes = await this._sp.web.lists
       .getById(this._listId)
       .contentTypes()
-      .then((types) => types.filter((ct) => ct.Name !== "Folder"));
+      .then((types) => types.filter((ct) => ct.Name !== 'Folder'));
 
     // Use a Set to avoid duplicate field IDs
     const fieldIdSet = new Set<string>();
@@ -106,26 +106,26 @@ export class PagePropertiesService implements IPagePropertiesService {
         .getById(this._listId)
         .contentTypes.getById(ct.Id.StringValue)
         .fields.select(
-          "Id",
-          "Title",
-          "InternalName",
-          "TypeAsString",
-          "Hidden",
-          "Group"
+          'Id',
+          'Title',
+          'InternalName',
+          'TypeAsString',
+          'Hidden',
+          'Group'
         )();
       for (const field of fields) {
         if (!fieldIdSet.has(field.Id)) {
           if (
             (field.Hidden ||
-              field.Group === "_Hidden" ||
-              field.Title === "Document Modified By" ||
-              field.Title === "Document Created By") &&
-            field.InternalName !== "Description" &&
-            field.InternalName !== "Modified" &&
-            field.InternalName !== "Created" &&
-            field.InternalName !== "Author" &&
-            field.InternalName !== "Editor" &&
-            field.InternalName !== "FileRef"
+              field.Group === '_Hidden' ||
+              field.Title === 'Document Modified By' ||
+              field.Title === 'Document Created By') &&
+            field.InternalName !== 'Description' &&
+            field.InternalName !== 'Modified' &&
+            field.InternalName !== 'Created' &&
+            field.InternalName !== 'Author' &&
+            field.InternalName !== 'Editor' &&
+            field.InternalName !== 'FileRef'
           ) {
             continue;
           }

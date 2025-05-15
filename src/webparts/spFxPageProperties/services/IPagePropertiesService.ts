@@ -1,4 +1,4 @@
-import { IListColumn } from "../models/IListSiteColumn";
+import { IListColumn } from '../models/IListSiteColumn';
 
 /**
  * Interface for a service that retrieves the current page's properties.
