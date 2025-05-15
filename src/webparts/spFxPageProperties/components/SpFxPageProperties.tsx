@@ -1,7 +1,6 @@
 import * as React from 'react';
 import styles from './SpFxPageProperties.module.scss';
 import type { ISpFxPagePropertiesProps } from './ISpFxPagePropertiesProps';
-import { escape } from '@microsoft/sp-lodash-subset';
 
 export default class SpFxPageProperties extends React.Component<ISpFxPagePropertiesProps> {
   public render(): React.ReactElement<ISpFxPagePropertiesProps> {
@@ -20,13 +19,15 @@ export default class SpFxPageProperties extends React.Component<ISpFxPagePropert
                 const value = pageProperties[column];
 
                 let displayValue = value || '';
-                if (displayValue && typeof displayValue === 'object') {
+                // console.log(column);
+                // console.log(typeof displayValue);
+                if (typeof displayValue === 'object') {
                   displayValue = JSON.stringify(value);
                 }
 
                 return (
                   <div key={column} className={styles.links}>
-                    <strong>{column}:</strong> {escape(String(value))}
+                    <strong>{column}:</strong> {displayValue}
                   </div>
                 );
               })}
