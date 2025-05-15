@@ -50,7 +50,7 @@ export class PagePropertiesService implements IPagePropertiesService {
       const fieldNames = listColumns
         .map(function (column) {
           if (column.fieldType === 'User' || column.fieldType === 'UserMulti') {
-            return [`${column.internalName}/Title`, `${column.internalName}/Id`, `${column.internalName}/UserName`];
+            return [`${column.internalName}/Title`, `${column.internalName}/Id`, `${column.internalName}/UserName`, `${column.internalName}/Name`];
           }
           return [column.internalName];
         })
