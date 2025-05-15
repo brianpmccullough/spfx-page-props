@@ -16,13 +16,19 @@ export default class SpFxPageProperties extends React.Component<ISpFxPagePropert
           <h3>Selected Page Properties:</h3>
           {selectedPageProperties && selectedPageProperties.length > 0 ? (
             <div className={styles.links}>
-              {selectedPageProperties.map(columnId => {
-                const value = pageProperties[columnId];
-                return value ? (
-                  <div key={columnId} className={styles.links}>
-                    <strong>{columnId}:</strong> {escape(String(value))}
+              {selectedPageProperties.map(column => {
+                const value = pageProperties[column];
+
+                let displayValue = value || '';
+                if (displayValue && typeof displayValue === 'object') {
+                  displayValue = JSON.stringify(value);
+                }
+
+                return (
+                  <div key={column} className={styles.links}>
+                    <strong>{column}:</strong> {escape(String(value))}
                   </div>
-                ) : null;
+                );
               })}
             </div>
           ) : (

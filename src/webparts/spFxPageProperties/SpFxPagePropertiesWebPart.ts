@@ -52,7 +52,11 @@ export default class SpFxPagePropertiesWebPart extends BaseClientSideWebPart<ISp
     this._pagePropertiesService = new PagePropertiesService(this.context);
     try {
       this._listColumns = await this._pagePropertiesService.getListColumns();
-      this._pageProperties = await this._pagePropertiesService.getPageProperties();
+      this._pageProperties = await this._pagePropertiesService.getPageProperties(this._listColumns);
+      console.log('this._listColumns');
+      console.log(this._listColumns);
+      console.log('this._pageProperties');
+      console.log(this._pageProperties);
       this.context.propertyPane.refresh();
 
     } catch (error) {

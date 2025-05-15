@@ -9,7 +9,7 @@ export interface IPagePropertiesService {
    * Gets the properties of the current page.
    * @returns Promise resolving to a dictionary of page properties.
    */
-  getPageProperties(): Promise<Record<string, unknown>>;
+  getPageProperties(listColumns: IListColumn[]): Promise<Record<string, unknown>>;
 
   getListColumns(): Promise<IListColumn[]>;
 }
