@@ -11,6 +11,7 @@ declare interface ISpFxPagePropertiesWebPartStrings {
   AppOfficeEnvironment: string;
   AppOutlookEnvironment: string;
   UnknownEnvironment: string;
+  PropertyPaneTitleLabel: string;
 }
 
 declare module 'SpFxPagePropertiesWebPartStrings' {

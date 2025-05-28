@@ -3,9 +3,11 @@ import '@pnp/sp/webs';
 import '@pnp/sp/lists';
 import '@pnp/sp/items';
 import '@pnp/sp/content-types';
+import '@pnp/sp/fields';
 import { IPagePropertiesService } from './IPagePropertiesService';
 import { BaseComponentContext } from '@microsoft/sp-component-base';
-import { IListColumn } from '../models/IListSiteColumn';
+import { IListColumn, IListColumnWithValue, LookupFieldValue, TaxonomyFieldValue, UserFieldValue } from '../models/IListSiteColumn';
+import { IFieldInfo } from '@pnp/sp/fields';
 
 /**
  * Service to retrieve the current page's properties using @pnp/sp and SPFx context.
@@ -38,13 +40,9 @@ export class PagePropertiesService implements IPagePropertiesService {
    *
    * @returns Promise resolving to a dictionary of page properties.
    * @throws Error if the service is not initialized (i.e., if _sp, _pageId, or _listId are not set).
-   *
-   * @example
-   *   const props = await pagePropertiesService.getPageProperties();
-   *   console.log(props.Title);
    */
-  public async getPageProperties(listColumns: IListColumn[] = []): Promise<Record<string, unknown>> {
-    if (this._sp && this._pageId && this._listId) {
+  public async getPageProperties(listColumns: IListColumn[] = []): Promise<IListColumnWithValue[]> {
+    if (this._sp && this._pageId && this._listId && listColumns.length > 0) {
       const lookupColumnTypes = ['User', 'UserMulti', 'Lookup', 'LookupMulti'];
 
       const fieldNames = listColumns
@@ -52,10 +50,17 @@ export class PagePropertiesService implements IPagePropertiesService {
           if (column.fieldType === 'User' || column.fieldType === 'UserMulti') {
             return [`${column.internalName}/Title`, `${column.internalName}/Id`, `${column.internalName}/UserName`, `${column.internalName}/Name`];
           }
+          if (column.fieldType === 'Lookup' || column.fieldType === 'LookupMulti') {
+            return [`${column.internalName}/Title`, `${column.internalName}/Id`];
+          }
+          if (column.fieldType === 'TaxonomyFieldType' || column.fieldType === 'TaxonomyFieldTypeMulti') {
+            return [`${column.internalName}`, 'TaxCatchAll/ID', 'TaxCatchAll/Term'];
+          }
+          
           return [column.internalName];
         })
-        .reduce(function (acc, val) {
-          return acc.concat(val);
+        .reduce(function (allFieldNames, fieldNameArray) {
+          return allFieldNames.concat(fieldNameArray);
         }, []);
 
       const expandFields = listColumns
@@ -63,14 +68,102 @@ export class PagePropertiesService implements IPagePropertiesService {
           return lookupColumnTypes.indexOf(column.fieldType) > -1;
         })
         .map((column) => column.internalName);
+      
+      if (fieldNames.indexOf('TaxCatchAll/ID') > -1) {
+        expandFields.push('TaxCatchAll');
+      }
+
 
       const item = await this._sp.web.lists
         .getById(this._listId)
         .items.getById(this._pageId)
         .select(fieldNames.join(','))
         .expand(expandFields.join(','))();
-      return item;
+
+
+      const values: IListColumnWithValue[] = listColumns.map((column) => {
+        const value = item[column.internalName];
+        let formattedValue: string | number | boolean | Date | null | UserFieldValue | UserFieldValue[] | LookupFieldValue | LookupFieldValue[] | TaxonomyFieldValue | TaxonomyFieldValue[] = null;
+        if (value !== null && value !== undefined) {
+          if (column.fieldType === 'User' || column.fieldType === 'UserMulti') {
+            const extractInitials = (name: string): string => {
+              const parts = name.split(' ');
+              return parts.length > 1
+                ? parts[0].charAt(0).toUpperCase() + parts[1].charAt(0).toUpperCase()
+                : name.charAt(0).toUpperCase();
+            };
+
+            if (Array.isArray(value)) {
+              formattedValue = value.map((user) => ({
+                id: user.Id,
+                name: user.Title,
+                initials: extractInitials(user.Title),
+                userName: user.UserName,
+                profilePictureUrl: `/_layouts/15/userphoto.aspx?size=L&accountname=${user.UserName}`
+              }));
+            } else {
+              formattedValue = {
+                id: value.Id,
+                name: value.Title,
+                initials: extractInitials(value.Title),
+                userName: value.UserName,
+                profilePictureUrl: `/_layouts/15/userphoto.aspx?size=L&accountname=${value.UserName}`
+              };
+            }
+          } else if (column.fieldType === 'Lookup' || column.fieldType === 'LookupMulti') {
+            if (Array.isArray(value)) {
+              formattedValue = value.map((lookup) => ({
+                id: lookup.Id,
+                title: lookup.Title,
+              }));
+            } else {
+              formattedValue = {
+                id: value.Id,
+                title: value.Title,
+              };
+            }
+          } else if (column.fieldType === 'TaxonomyFieldType' || column.fieldType === 'TaxonomyFieldTypeMulti') {
+            if (Array.isArray(value)) {
+              formattedValue = value.map((term) => {
+                return {
+                  id: term.TermGuid,
+                  term: term.Label,
+                };
+              });
+            } else {
+            
+              const taxonomyCatchAllField = item.TaxCatchAll as {
+                ID: string;
+                Term: string;
+                TermGuid: string;
+                'odata.id': string
+              }[];
+              const term = taxonomyCatchAllField.find((t) => t.ID === value.WssId);
+              formattedValue = term
+                ? {
+                    id: value.TermGuid,
+                    term: term.Term,
+                  }
+                : null;
+            }
+          } else if (column.fieldType === 'DateTime') {
+            formattedValue = new Date(value);
+          } else if (column.fieldType === 'Boolean') {
+            formattedValue = value && (value === '1' || value === true);
+          } else {
+            formattedValue = value;
+          }
+        }
+
+        return {
+          ...column,
+          value: formattedValue,
+        };
+      });
+
+      return values;
     }
+
     throw new Error('Service not initialized.');
   }
 
@@ -85,9 +178,11 @@ export class PagePropertiesService implements IPagePropertiesService {
       throw new Error('Service not initialized.');
     }
 
+    // Get all content types except 'Folder', and include their fields
     const contentTypes = await this._sp.web.lists
       .getById(this._listId)
-      .contentTypes()
+      .contentTypes
+      .expand('Fields')()
       .then((types) => types.filter((ct) => ct.Name !== 'Folder'));
 
     // Use a Set to avoid duplicate field IDs
@@ -95,11 +190,15 @@ export class PagePropertiesService implements IPagePropertiesService {
     const columns: IListColumn[] = [];
 
     for (const ct of contentTypes) {
-      // Get fields for each content type
+      //TODO: log a bug for this in pnp/sp?
+      // eslint-disable-next-line dot-notation, @typescript-eslint/no-explicit-any
+      const fields = (ct as any)['Fields'] as IFieldInfo[];
+      /*
       const fields = await this._sp.web.lists
         .getById(this._listId)
         .contentTypes.getById(ct.Id.StringValue)
         .fields.select('Id', 'Title', 'InternalName', 'TypeAsString', 'Hidden', 'Group')();
+      */
       for (const field of fields) {
         if (!fieldIdSet.has(field.Id)) {
           if (
@@ -126,6 +225,7 @@ export class PagePropertiesService implements IPagePropertiesService {
         }
       }
     }
+    
     return columns;
   }
 }

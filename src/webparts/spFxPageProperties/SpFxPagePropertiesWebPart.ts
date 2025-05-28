@@ -11,22 +11,29 @@ import SpFxPageProperties from './components/SpFxPageProperties';
 import { ISpFxPagePropertiesProps } from './components/ISpFxPagePropertiesProps';
 import { PagePropertiesService } from './services/PagePropertiesService';
 import { IPagePropertiesService } from './services/IPagePropertiesService';
-import { IListColumn } from './models/IListSiteColumn';
+import { IListColumn, IListColumnWithValue } from './models/IListSiteColumn';
 
 export interface ISpFxPagePropertiesWebPartProps {
-  description: string;
+  title: string;
   selectedPageProperties: string[];
 }
 
 export default class SpFxPagePropertiesWebPart extends BaseClientSideWebPart<ISpFxPagePropertiesWebPartProps> {
   private _isDarkTheme: boolean = false;
   private _pagePropertiesService: IPagePropertiesService;
-  private _pageProperties: Record<string, unknown> = {};
+  private _pageProperties: IListColumnWithValue[] = [];
   private _listColumns: IListColumn[] = [];
 
   public render(): void {
+
+    //console.log(this._pageProperties);
+
     const element: React.ReactElement<ISpFxPagePropertiesProps> = React.createElement(SpFxPageProperties, {
-      description: this.properties.description,
+      title: this.properties.title,
+      displayMode: this.displayMode,
+      updateTitle: (value: string) => {
+        this.properties.title = value;
+      },
       isDarkTheme: this._isDarkTheme,
       hasTeamsContext: !!this.context.sdks.microsoftTeams,
       userDisplayName: this.context.pageContext.user.displayName,
@@ -44,10 +51,6 @@ export default class SpFxPagePropertiesWebPart extends BaseClientSideWebPart<ISp
     try {
       this._listColumns = await this._pagePropertiesService.getListColumns();
       this._pageProperties = await this._pagePropertiesService.getPageProperties(this._listColumns);
-      console.log('this._listColumns');
-      console.log(this._listColumns);
-      console.log('this._pageProperties');
-      console.log(this._pageProperties);
       this.context.propertyPane.refresh();
     } catch (error) {
       console.error('Error fetching page properties:', error);
@@ -84,6 +87,7 @@ export default class SpFxPagePropertiesWebPart extends BaseClientSideWebPart<ISp
    */
   protected async onPropertyPaneConfigurationStart(): Promise<void> {}
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   protected onPropertyPaneFieldChanged(propertyPath: string, oldValue: any, newValue: any): void {
     if (propertyPath === 'selectedPageProperties') {
       this.properties.selectedPageProperties = newValue;
@@ -103,8 +107,8 @@ export default class SpFxPagePropertiesWebPart extends BaseClientSideWebPart<ISp
             {
               groupName: strings.BasicGroupName,
               groupFields: [
-                PropertyPaneTextField('description', {
-                  label: strings.DescriptionFieldLabel,
+                PropertyPaneTextField('title', {
+                  label: strings.PropertyPaneTitleLabel,
                 }),
                 PropertyFieldMultiSelect('selectedPageProperties', {
                   key: 'selectedPageProperties',
