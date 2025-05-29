@@ -202,7 +202,12 @@ export class PagePropertiesService implements IPagePropertiesService {
       for (const field of fields) {
         if (!fieldIdSet.has(field.Id)) {
           if (
-            (field.Hidden || field.Group === '_Hidden' || field.Title === 'Document Modified By' || field.Title === 'Document Created By') &&
+            (field.Hidden 
+              || field.Group === '_Hidden'
+              || field.InternalName.startsWith('_')
+              || field.Title === 'Document Modified By' 
+              || field.Title === 'Document Created By'
+            ) &&
             field.InternalName !== 'Description' &&
             field.InternalName !== 'Modified' &&
             field.InternalName !== 'Created' &&
