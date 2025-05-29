@@ -1,0 +1,17 @@
+export type SharePointFieldType =
+  | 'Text'
+  | 'Note'
+  | 'User'
+  | 'UserMulti'
+  | 'Lookup'
+  | 'LookupMulti'
+  | 'TaxonomyFieldType'
+  | 'TaxonomyFieldTypeMulti'
+  | 'DateTime'
+  | 'Boolean'
+  | 'Choice'
+  | 'MultiChoice'
+  | 'Number'
+  | 'Currency'
+  | 'URL'
+  | 'HTML';

@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Persona, PersonaSize, PersonaPresence } from '@fluentui/react/lib/Persona';
-import { IListColumnWithValue, LookupFieldValue, TaxonomyFieldValue, UserFieldValue } from '../models/IListSiteColumn';
+import { IListColumnWithValue, LookupFieldValue, TaxonomyFieldValue, UrlFieldValue, UserFieldValue } from '../models/IListSiteColumn';
 import styles from './SpFxPageProperties.module.scss';
 import { Chip } from './Chip';
 
@@ -62,7 +62,7 @@ export default class PageProperty extends React.Component<IListColumnWithValue> 
           ))}
         </div>
       );
-    } else if (fieldType === 'Choice' || fieldType === 'ChoiceMulti') {
+    } else if (fieldType === 'Choice' || fieldType === 'MultiChoice') {
       const values = ensureMultiValue(value as string | string[]);
       return (
         <div className={styles.chipContainer}>
@@ -75,6 +75,9 @@ export default class PageProperty extends React.Component<IListColumnWithValue> 
       return <span>{new Date(value as string).toLocaleDateString()}</span>;
     } else if (fieldType === 'Boolean') {
       return <span>{value ? 'Yes' : 'No'}</span>;
+    } else if (fieldType === 'URL') {
+      const urlValue: UrlFieldValue = value as UrlFieldValue;
+      return <span><a href={urlValue.url}>{urlValue.displayText}</a></span>;
     }
 
     if (typeof value === 'string') {

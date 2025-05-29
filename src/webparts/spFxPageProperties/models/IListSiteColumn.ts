@@ -1,3 +1,5 @@
+import { SharePointFieldType } from "../services/SharePointFieldType";
+
 export interface IListColumn {
   /** The unique identifier (GUID) of the field */
   id: string;
@@ -6,7 +8,7 @@ export interface IListColumn {
   /** The internal name of the field */
   internalName: string;
   /** The field type as a string (e.g. User, Hyperlink, Text, Date, Lookup, TaxonomyFieldType) */
-  fieldType: string;
+  fieldType: SharePointFieldType;
   /** Whether the field is hidden */
   hidden: boolean;
   /** The group the field belongs to */
@@ -40,8 +42,15 @@ export interface TaxonomyFieldValue {
   term: string;
 }
 
+export interface UrlFieldValue {
+  /** The URL of the link */
+  url: string;
+  /** The description of the link */
+  displayText: string;
+}
+
 export interface IListColumnWithValue extends IListColumn {
   /** The value of the field */
   // eslint-disable-next-line @rushstack/no-new-null
-  value: string | number | boolean | Date | UserFieldValue | UserFieldValue[] | LookupFieldValue | LookupFieldValue[] | TaxonomyFieldValue | TaxonomyFieldValue[] | null;
+  value: string | number | boolean | Date | UserFieldValue | UserFieldValue[] | LookupFieldValue | LookupFieldValue[] | TaxonomyFieldValue | TaxonomyFieldValue[] | UrlFieldValue | null;
 }

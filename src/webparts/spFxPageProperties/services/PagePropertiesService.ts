@@ -6,8 +6,9 @@ import '@pnp/sp/content-types';
 import '@pnp/sp/fields';
 import { IPagePropertiesService } from './IPagePropertiesService';
 import { BaseComponentContext } from '@microsoft/sp-component-base';
-import { IListColumn, IListColumnWithValue, LookupFieldValue, TaxonomyFieldValue, UserFieldValue } from '../models/IListSiteColumn';
+import { IListColumn, IListColumnWithValue, LookupFieldValue, TaxonomyFieldValue, UrlFieldValue, UserFieldValue } from '../models/IListSiteColumn';
 import { IFieldInfo } from '@pnp/sp/fields';
+import { SharePointFieldType } from './SharePointFieldType';
 
 /**
  * Service to retrieve the current page's properties using @pnp/sp and SPFx context.
@@ -83,7 +84,7 @@ export class PagePropertiesService implements IPagePropertiesService {
 
       const values: IListColumnWithValue[] = listColumns.map((column) => {
         const value = item[column.internalName];
-        let formattedValue: string | number | boolean | Date | null | UserFieldValue | UserFieldValue[] | LookupFieldValue | LookupFieldValue[] | TaxonomyFieldValue | TaxonomyFieldValue[] = null;
+        let formattedValue: string | number | boolean | Date | null | UserFieldValue | UserFieldValue[] | LookupFieldValue | LookupFieldValue[] | TaxonomyFieldValue | TaxonomyFieldValue[] | UrlFieldValue = null;
         if (value !== null && value !== undefined) {
           if (column.fieldType === 'User' || column.fieldType === 'UserMulti') {
             const extractInitials = (name: string): string => {
@@ -150,6 +151,11 @@ export class PagePropertiesService implements IPagePropertiesService {
             formattedValue = new Date(value);
           } else if (column.fieldType === 'Boolean') {
             formattedValue = value && (value === '1' || value === true);
+          } else if (column.fieldType === 'URL') {
+            formattedValue = {
+              url: value.Url,
+              displayText: value.Description || value.Url
+            } as UrlFieldValue;
           } else {
             formattedValue = value;
           }
@@ -217,7 +223,7 @@ export class PagePropertiesService implements IPagePropertiesService {
             id: field.Id,
             title: field.Title,
             internalName: field.InternalName,
-            fieldType: field.TypeAsString,
+            fieldType: field.TypeAsString as SharePointFieldType,
             hidden: field.Hidden,
             group: field.Group,
           });
