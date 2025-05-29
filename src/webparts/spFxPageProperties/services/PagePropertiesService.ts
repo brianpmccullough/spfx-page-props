@@ -193,12 +193,7 @@ export class PagePropertiesService implements IPagePropertiesService {
       //TODO: log a bug for this in pnp/sp?
       // eslint-disable-next-line dot-notation, @typescript-eslint/no-explicit-any
       const fields = (ct as any)['Fields'] as IFieldInfo[];
-      /*
-      const fields = await this._sp.web.lists
-        .getById(this._listId)
-        .contentTypes.getById(ct.Id.StringValue)
-        .fields.select('Id', 'Title', 'InternalName', 'TypeAsString', 'Hidden', 'Group')();
-      */
+
       for (const field of fields) {
         if (!fieldIdSet.has(field.Id)) {
           if (
