@@ -199,7 +199,7 @@ export class PagePropertiesService implements IPagePropertiesService {
       //TODO: log a bug for this in pnp/sp?
       // eslint-disable-next-line dot-notation, @typescript-eslint/no-explicit-any
       const fields = (ct as any)['Fields'] as IFieldInfo[];
-
+      console.log(fields);
       for (const field of fields) {
         if (!fieldIdSet.has(field.Id)) {
           if (
