@@ -7,7 +7,7 @@ export default class SpFxPageProperties extends React.Component<ISpFxPagePropert
 
   public render(): React.ReactElement<ISpFxPagePropertiesProps> {
     const { pageProperties } = this.props;
-    console.log(pageProperties);
+    
     return (
       <div className={styles.spFxPageProperties}>
         {pageProperties && pageProperties.length > 0 ? (
