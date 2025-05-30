@@ -37,7 +37,7 @@ export default class PageProperty extends React.Component<IListColumnWithValue> 
             <Persona
               key={index}
               text={user.name}
-              size={PersonaSize.size24}
+              size={PersonaSize.size32}
               presence={PersonaPresence.none}
               imageUrl={user.profilePictureUrl}
               imageInitials={user.initials}
