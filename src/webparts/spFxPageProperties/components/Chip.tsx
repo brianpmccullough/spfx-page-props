@@ -1,25 +1,14 @@
 import * as React from 'react';
-import { ITheme, useTheme } from '@fluentui/react';
+import styles from './PageProperties.module.scss';
 
 export interface IChipProps {
-  label: string;
-  className?: string;
+  label?: string;
 }
 
-export const Chip: React.FC<IChipProps> = ({ label, className }) => {
-  const theme: ITheme = useTheme();
-  
-  const chipStyle: React.CSSProperties = {
-    display: 'inline-block',
-    padding: '4px 8px',
-    margin: '2px',
-    borderRadius: '16px',
-    backgroundColor: theme.palette.neutralLighter,
-    color: theme.palette.neutralPrimary,
-  };
+export const Chip: React.FC<IChipProps> = ({ label }) => {
 
   return (
-    <span style={chipStyle} className={className}>
+    <span className={styles.chip}>
       {label}
     </span>
   );

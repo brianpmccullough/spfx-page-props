@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Persona, PersonaSize, PersonaPresence } from '@fluentui/react/lib/Persona';
 import { IListColumnWithValue, LookupFieldValue, TaxonomyFieldValue, UrlFieldValue, UserFieldValue } from '../models/IListSiteColumn';
-import styles from './SpFxPageProperties.module.scss';
+import styles from './PageProperties.module.scss';
 import { Chip } from './Chip';
 
 export default class PageProperty extends React.Component<IListColumnWithValue> {
@@ -10,8 +10,8 @@ export default class PageProperty extends React.Component<IListColumnWithValue> 
     const { internalName, title } = this.props;
 
     return (
-      <div key={internalName} className="property">
-        <h3 className="ms-fontSize-20 ms-fontWeight-regular property-name">{title}</h3>
+      <div key={internalName} className={styles.property}>
+        <h3>{title}</h3>
         <div className="property-value">
           {this._renderValue(this.props)}
         </div>
@@ -32,7 +32,7 @@ export default class PageProperty extends React.Component<IListColumnWithValue> 
 
     if (fieldType === 'User' || fieldType === 'UserMulti') {
       const values = ensureMultiValue(value as UserFieldValue | UserFieldValue[]);
-      return (<div className="personas">
+      return (<div className={styles.chipContainer}>
           {values.map((user, index) => (
             <Persona
               key={index}

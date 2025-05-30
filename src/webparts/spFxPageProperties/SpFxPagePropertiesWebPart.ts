@@ -4,14 +4,15 @@ import { Version } from '@microsoft/sp-core-library';
 import { type IPropertyPaneConfiguration, PropertyPaneTextField, IPropertyPaneDropdownOption } from '@microsoft/sp-property-pane';
 import { PropertyFieldMultiSelect } from '@pnp/spfx-property-controls';
 import { BaseClientSideWebPart } from '@microsoft/sp-webpart-base';
-import { IReadonlyTheme } from '@microsoft/sp-component-base';
+import { IReadonlyTheme, ThemeProvider } from '@microsoft/sp-component-base';
 
 import * as strings from 'SpFxPagePropertiesWebPartStrings';
-import SpFxPageProperties from './components/SpFxPageProperties';
-import { ISpFxPagePropertiesProps } from './components/ISpFxPagePropertiesProps';
+import PageProperties from './components/PageProperties';
+import { IPagePropertiesProps } from './components/IPagePropertiesProps';
 import { PagePropertiesService } from './services/PagePropertiesService';
 import { IPagePropertiesService } from './services/IPagePropertiesService';
 import { IListColumn, IListColumnWithValue } from './models/IListSiteColumn';
+
 
 export interface ISpFxPagePropertiesWebPartProps {
   title: string;
@@ -19,24 +20,20 @@ export interface ISpFxPagePropertiesWebPartProps {
 }
 
 export default class SpFxPagePropertiesWebPart extends BaseClientSideWebPart<ISpFxPagePropertiesWebPartProps> {
-  private _isDarkTheme: boolean = false;
+  private _theme: IReadonlyTheme | undefined;
   private _pagePropertiesService: IPagePropertiesService;
   private _pageProperties: IListColumnWithValue[] = [];
   private _listColumns: IListColumn[] = [];
 
   public render(): void {
 
-    //console.log(this._pageProperties);
-
-    const element: React.ReactElement<ISpFxPagePropertiesProps> = React.createElement(SpFxPageProperties, {
+    const element: React.ReactElement<IPagePropertiesProps> = React.createElement(PageProperties, {
+      theme: this._theme || {},
       title: this.properties.title,
       displayMode: this.displayMode,
       updateTitle: (value: string) => {
         this.properties.title = value;
       },
-      isDarkTheme: this._isDarkTheme,
-      hasTeamsContext: !!this.context.sdks.microsoftTeams,
-      userDisplayName: this.context.pageContext.user.displayName,
       pageProperties: this._pageProperties,
       selectedPageProperties: this.properties.selectedPageProperties || [],
     });
@@ -46,6 +43,9 @@ export default class SpFxPagePropertiesWebPart extends BaseClientSideWebPart<ISp
 
   protected async onInit(): Promise<void> {
     await super.onInit();
+
+    const themeProvider = this.context.serviceScope.consume(ThemeProvider.serviceKey);
+    this._theme = themeProvider.tryGetTheme();
 
     this._pagePropertiesService = new PagePropertiesService(this.context);
     try {
@@ -64,13 +64,15 @@ export default class SpFxPagePropertiesWebPart extends BaseClientSideWebPart<ISp
       return;
     }
 
-    this._isDarkTheme = !!currentTheme.isInverted;
+    this._theme = currentTheme;
     const { semanticColors } = currentTheme;
 
     if (semanticColors) {
       this.domElement.style.setProperty('--bodyText', semanticColors.bodyText || null);
       this.domElement.style.setProperty('--link', semanticColors.link || null);
       this.domElement.style.setProperty('--linkHovered', semanticColors.linkHovered || null);
+      this.domElement.style.setProperty('--neutralLighterAlt', currentTheme.palette?.neutralLighterAlt || null);
+      this.domElement.style.setProperty('--neutralPrimary', currentTheme.palette?.neutralPrimary || null);
     }
   }
 
