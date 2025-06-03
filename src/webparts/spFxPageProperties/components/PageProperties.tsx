@@ -1,8 +1,9 @@
 import * as React from 'react';
+import { createTheme, ThemeProvider } from '@fluentui/react';
 import styles from './PageProperties.module.scss';
 import type { IPagePropertiesProps } from './IPagePropertiesProps';
 import PageProperty from './PageProperty';
-import { createTheme, ThemeProvider } from '@fluentui/react';
+import { IListColumnWithValue } from '../models/IListSiteColumn';
 
 export default class PageProperties extends React.Component<IPagePropertiesProps> {
 
@@ -14,9 +15,10 @@ export default class PageProperties extends React.Component<IPagePropertiesProps
       semanticColors: theme.semanticColors ?? undefined,
       isInverted: theme.isInverted
     });
-    const propertiesToDisplay = pageProperties.filter(property =>
-      selectedPageProperties.indexOf(property.internalName) !== -1
-    );
+
+    const propertiesToDisplay: IListColumnWithValue[] = selectedPageProperties
+      .map(selectedProperty => pageProperties.find(p => p.internalName.toLowerCase() === selectedProperty.toLowerCase()))
+      .filter((property): property is IListColumnWithValue => property !== undefined);
 
     console.log(propertiesToDisplay);
 
